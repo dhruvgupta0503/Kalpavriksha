@@ -42,14 +42,14 @@ int evaluate_expression(const char *exp, int *result) {
     for (int i = 0; exp[i]; i++) {
         if (is_space(exp[i])) continue;
 
-        // If the character is a digit, extract the number
+       
         if (is_digit(exp[i])) {
             int num = 0;
             while (is_digit(exp[i])) {
                 num = num * 10 + (exp[i++] - '0');
             }
             values[++top] = num;
-            i--; // Adjust for the last increment
+            i--; 
         } 
        
         else if (is_operator(exp[i])) {
