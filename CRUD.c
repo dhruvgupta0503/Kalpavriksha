@@ -1,7 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 
 typedef struct {
     int id;
@@ -12,28 +9,46 @@ typedef struct {
 #define FILE_NAME "users.txt"
 
 
-void initializeFile() {
-    FILE *file = fopen(FILE_NAME, "a");
+FILE* openFile(const char* mode) {
+    FILE* file = fopen(FILE_NAME, mode);
     if (file == NULL) {
-        printf("Error creating the file!\n");
-        exit(1);
+        printf("Error opening the file!\n");
     }
-    fclose(file);
+    return file;
 }
 
 
-void createUser() {
-    FILE *file = fopen(FILE_NAME, "a");
-    if (file == NULL) {
-        printf("Error opening the file!\n");
-        return;
+int isUniqueID(int id) {
+    FILE* file = openFile("r");
+    if (!file) return 0;
+
+    User user;
+    while (fscanf(file, "%d,%49[^,],%d\n", &user.id, user.name, &user.age) != EOF) {
+        if (user.id == id) {
+            fclose(file);
+            return 0; 
+        }
     }
+    fclose(file);
+    return 1;
+}
+
+int createUser() {
+    FILE* file = openFile("a");
+    if (!file) return 0;
 
     User user;
     printf("Enter ID: ");
     scanf("%d", &user.id);
+
+    if (!isUniqueID(user.id)) {
+        printf("Error: ID already exists. Please use a unique ID.\n");
+        fclose(file);
+        return 0;
+    }
+
     printf("Enter Name: ");
-    scanf(" %[^\n]s", user.name); 
+    scanf(" %[^\n]s", user.name);
     printf("Enter Age: ");
     scanf("%d", &user.age);
 
@@ -41,15 +56,13 @@ void createUser() {
     fclose(file);
 
     printf("User added successfully!\n");
+    return 1;
 }
 
 
 void readUsers() {
-    FILE *file = fopen(FILE_NAME, "r");
-    if (file == NULL) {
-        printf("Error opening the file!\n");
-        return;
-    }
+    FILE* file = openFile("r");
+    if (!file) return;
 
     User user;
     printf("ID\tName\t\tAge\n");
@@ -60,23 +73,18 @@ void readUsers() {
     fclose(file);
 }
 
-
-void updateUser() {
-    FILE *file = fopen(FILE_NAME, "r");
-    if (file == NULL) {
-        printf("Error opening the file!\n");
-        return;
-    }
+int updateUser() {
+    FILE* file = openFile("r");
+    if (!file) return 0;
 
     int targetId, found = 0;
     printf("Enter the ID of the user to update: ");
     scanf("%d", &targetId);
 
-    FILE *tempFile = fopen("temp.txt", "w");
-    if (tempFile == NULL) {
-        printf("Error creating temporary file!\n");
+    FILE* tempFile = openFile("w");
+    if (!tempFile) {
         fclose(file);
-        return;
+        return 0;
     }
 
     User user;
@@ -102,25 +110,21 @@ void updateUser() {
         remove("temp.txt");
         printf("User with ID %d not found!\n", targetId);
     }
+    return found;
 }
 
-
-void deleteUser() {
-    FILE *file = fopen(FILE_NAME, "r");
-    if (file == NULL) {
-        printf("Error opening the file!\n");
-        return;
-    }
+int deleteUser() {
+    FILE* file = openFile("r");
+    if (!file) return 0;
 
     int targetId, found = 0;
     printf("Enter the ID of the user to delete: ");
     scanf("%d", &targetId);
 
-    FILE *tempFile = fopen("temp.txt", "w");
-    if (tempFile == NULL) {
-        printf("Error creating temporary file!\n");
+    FILE* tempFile = openFile("w");
+    if (!tempFile) {
         fclose(file);
-        return;
+        return 0;
     }
 
     User user;
@@ -143,13 +147,11 @@ void deleteUser() {
         remove("temp.txt");
         printf("User with ID %d not found!\n", targetId);
     }
+    return found;
 }
-
 
 int main() {
     int choice;
-
-    initializeFile();
 
     do {
         printf("\nUser Management System\n");
