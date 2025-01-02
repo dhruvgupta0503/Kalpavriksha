@@ -1,44 +1,23 @@
-#include <stdio.h>
-
-int exponentMod(int A, int B, int C)
-{
-    // Base cases
-    if (A == 0)
-        return 0;
-    if (B == 0)
-        return 1;
-
-    // If B is even
-    long y;
-    if (B % 2 == 0) {
-        y = exponentMod(A, B / 2, C);
-        y = (y * y) % C;
-    }
-    // If B is odd
-    else {
-        y = A % C;
-        y = (y * exponentMod(A, B - 1, C) % C) % C;
-    }
-
-    return (int)((y + C) % C);
-}
-
+#include<stdio.h>
 int main()
 {
-    int A, B, C;
+    int B,N,M;
+    printf("Enter Base exponent and modulus \n");
+    scanf("%d%d%d",&B,&N,&M);
+    if(N<0 || M<1)
+    {
+        printf("Invalid Input");
+        return 1;
+    }
+    int result=1;
+    B=B%M; // Ensuring base is always in the range of modulus.
+    while(N>0){
+        if(N%2==1){
+            result=(result*B)%M;
+        }
+        N=N/2;
+        B=B*B%M;
+    }
+    printf("Result=%d",result);
 
-   
-    printf("Enter the base (A): ");
-    scanf("%d", &A);
-
-    printf("Enter the exponent (B): ");
-    scanf("%d", &B);
-
-    printf("Enter the modulus (C): ");
-    scanf("%d", &C);
-
-   
-    printf("Power is %d\n", exponentMod(A, B, C));
-
-    return 0;
 }
