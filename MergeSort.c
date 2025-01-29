@@ -1,126 +1,116 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef struct singlyLinkedList
+ 
+//Implementing merge sort using linked list
+//Time complexity O(nlogn) logn for recursive division and n for the merge function
+ 
+typedef struct Node
 {
-    int data;
-    struct singlyLinkedList *next;
-} node;
-
-node *createNode(int value)
+    int val;
+    struct Node *next;
+} Node;
+ 
+Node *head = NULL;
+ 
+void create_ll(int data)
 {
-    node *newNode = (node *)malloc(sizeof(node));
-    newNode->data = value;
-    newNode->next = NULL;
-    return newNode;
-}
-
-void printLinkedList(node *head)
-{
-    node *current = head;
-    while (current != NULL)
+    Node *new_node = (Node *)malloc(sizeof(Node));
+    new_node->val = data;
+    new_node->next = NULL;
+ 
+    if (head == NULL)
     {
-        printf("%d ", current->data);
-        current = current->next;
-    }
-    printf("\n");
-}
-
-node *mergeSortedLists(node *a, node *b)
-{
-    // Base cases for recursion
-    if (a == NULL)
-        return b;
-    if (b == NULL)
-        return a;
-
-    // Compare the nodes for descending order
-    if (a->data >= b->data)
-    {
-        a->next = mergeSortedLists(a->next, b);
-        return a;
+        head = new_node;
     }
     else
     {
-        b->next = mergeSortedLists(a, b->next);
-        return b;
+        Node *temp = head;
+        while (temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+        temp->next = new_node;
     }
 }
-
-void splitLinkedList(node *source, node **front, node **back)
+ 
+void printList()
 {
-    node *slow = source;
-    node *fast = source->next;
-
-    // Advance fast by two steps, and slow by one step
-    while (fast != NULL)
+    Node *temp = head;
+    while (temp != NULL)
     {
-        fast = fast->next;
-        if (fast != NULL)
-        {
-            slow = slow->next;
-            fast = fast->next;
-        }
+        printf("%d ", temp->val);
+        temp = temp->next;
     }
-
-    *front = source;
-    *back = slow->next;
+    printf("\n");
+}
+ 
+ 
+Node *split(Node *head)
+{
+    Node *slow = head;
+    Node *fast = head->next;
+ 
+    while (fast != NULL && fast->next != NULL)
+    {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+ 
+    Node *second_half = slow->next;
     slow->next = NULL;
+ 
+    return second_half;
 }
-
-void mergeSortLinkedList(node **head)
+ 
+ 
+Node *merge(Node *first, Node *second)
 {
-    // Base case: list is empty or has one node
-    if (*head == NULL || (*head)->next == NULL)
-        return;
-
-    node *front, *back;
-
-    // Split the list into two halves
-    splitLinkedList(*head, &front, &back);
-
-    // Recursively sort the two halves
-    mergeSortLinkedList(&front);
-    mergeSortLinkedList(&back);
-
-    // Merge the sorted halves
-    *head = mergeSortedLists(front, back);
-}
-
-node *createLinkedList()
-{
-    node *head = NULL;
-    node *current = NULL;
-    int number;
-
-    printf("Enter numbers for the linked list (enter non-numeric value to stop):\n");
-    while (scanf("%d", &number) == 1)
+    if (!first)
+        return second;
+    if (!second)
+        return first;
+ 
+    if (first->val < second->val)
     {
-        if (head == NULL)
-        {
-            current = createNode(number);
-            head = current;
-        }
-        else
-        {
-            current->next = createNode(number);
-            current = current->next;
-        }
-        if (getchar() == '\n')  // Stop input when newline is encountered
-        {
-            break;
-        }
+        first->next = merge(first->next, second);
+        return first;
     }
-    return head;
+    else
+    {
+        second->next = merge(first, second->next);
+        return second;
+    }
 }
-
+ 
+ 
+Node *mergeSort(Node *head)
+{
+    if (!head || !head->next)
+        return head;
+ 
+    Node *second = split(head);
+ 
+    head = mergeSort(head);
+    second = mergeSort(second);
+ 
+    return merge(head, second);
+}
+ 
 int main()
 {
-    node *head = createLinkedList();
-
-    mergeSortLinkedList(&head);
-    printf("Descending order of elements: \n");
-    printLinkedList(head);
-
+    int arr[10] = {4, 1, 7, 8, 6, 8, 1, 3, 8, 3};
+    int n = 10;
+    for (int i = 0; i < n; i++)
+    {
+        create_ll(arr[i]);
+    }
+    printf("Before sorting: ");
+    printList();
+ 
+    head = mergeSort(head);
+ 
+    printf("After Sorting: ");
+    printList();
+ 
     return 0;
 }
