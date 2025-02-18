@@ -120,7 +120,7 @@ int main()
 {
     Dictionary d;
     int top = -1;
-    char strp[] = "name=shubh&age=23&city=Bangalore&lang=C++|Python|Go";
+    char strp[] = "name=dhruv&age=22&city=Bangalore&lang=C++|Python|Go";
     char *ptr = strp;
     char *token = strtok(ptr, "&");
     while (token != NULL)

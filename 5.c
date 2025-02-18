@@ -30,7 +30,7 @@ void convert(char *token){
     float converted_temp;
     char converted_unit;
     sscanf(token," %[^-]-%f%c",time,&temp,&ch);
-   printf("%s %f, %c",time,temp,ch);
+//    printf("%s %f, %c",time,temp,ch);
  if (ch == 'C') {
         converted_temp = (temp * 9 / 5) + 32;
         converted_unit = 'F';
